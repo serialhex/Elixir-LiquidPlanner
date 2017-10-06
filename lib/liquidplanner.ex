@@ -1,6 +1,6 @@
-defmodule ElixirLiquidplanner do
+defmodule Liquidplanner do
   @moduledoc """
-  Documentation for ElixirLiquidplanner.
+  Documentation for Liquidplanner.
   """
 
   @doc """
@@ -8,7 +8,7 @@ defmodule ElixirLiquidplanner do
 
   ## Examples
 
-      iex> ElixirLiquidplanner.hello
+      iex> Liquidplanner.hello
       :world
 
   """
