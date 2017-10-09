@@ -15,7 +15,7 @@ defmodule Liquidplanner.Mixfile do
   def application do
     [
       extra_applications: [:logger],
-      mod: {Liquidplanner.Application, []}
+      mod: {LiquidPlanner, []}
     ]
   end
 

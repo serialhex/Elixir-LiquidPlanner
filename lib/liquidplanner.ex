@@ -1,18 +1,11 @@
-defmodule Liquidplanner do
+defmodule LiquidPlanner do
   @moduledoc """
-  Documentation for Liquidplanner.
+  Bootstrap LiquidPlanner app.
   """
 
-  @doc """
-  Hello world.
+  use Application
 
-  ## Examples
-
-      iex> Liquidplanner.hello
-      :world
-
-  """
-  def hello do
-    :world
+  def start(_type, _args) do
+      LiquidPlanner.Supervisor.start_link()
   end
 end

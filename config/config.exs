@@ -28,3 +28,8 @@ use Mix.Config
 # here (which is why it is important to import them last).
 #
 #     import_config "#{Mix.env}.exs"
+
+config :liquidplanner,
+  uri: "https://app.liquidplanner.com/api",
+  # yes there will be a better way, i need to bootstrap this though...
+  token: "./config/token" |> File.read! |> String.trim
