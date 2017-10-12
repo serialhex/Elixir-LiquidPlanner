@@ -2,28 +2,29 @@ defmodule LiquidPlanner.HTTP do
 
   require Logger
   use GenServer
+  use HTTPoison.Base
 
   @base_uri Application.get_env(:liquidplanner, :uri)
   @token Application.get_env(:liquidplanner, :token)
 
-  def get(url, opts \\ []) do
-    Logger.info "Getting from: `#{@base_uri <> url}` token: `#{@token}`"
-    HTTPoison.get(@base_uri <> url,
-                  [{"Authorization", "Bearer " <> @token} | opts])
+  ##############################################################################
+  # HTTPoison pre-processors
+  def process_url(url) do
+    Logger.info inspect(url)
+    @base_uri <> url
+  end
+  def process_request_body(body) do
+    Logger.info inspect(body)
+    Poison.encode! body
+  end
+  def process_request_headers(headers) do
+    Logger.info inspect(headers)
+    [{"Authorization", "Bearer " <> @token},
+     {"Content-Type", "application/json"}
+     | headers]
   end
 
-  def post(url, opts \\ []) do
-    Logger.info "Posting to: `#{@base_uri <> url}` token: `#{@token}`"
-    HTTPoison.post(@base_uri <> url,
-                   [{"Authorization", "Bearer " <> @token} | opts])
-  end
-
-  def put(url, opts \\ []) do
-    Logger.info "Putting to: `#{@base_uri <> url}` token: `#{@token}`"
-    HTTPoison.put(@base_uri <> url,
-                  [{"Authorization", "Bearer " <> @token} | opts])
-  end
-
+  ##############################################################################
   # Look into making these better with macros...
   def account do
     case get("/account") do
@@ -53,10 +54,16 @@ defmodule LiquidPlanner.HTTP do
     end
   end
 
-  def create_task(data) do
-    opts = [{:body, {:task, data}}]
-    { 'name' => 'learn the API', 'parent_id' => projects.first['id'] }
-    post "workspaces/#{workspace_id()}/tasks", opts
+  def create_task(data \\ []) do
+    data = Enum.into(data, %{})
+    body = %{task: data}
+    post "/workspaces/#{workspace_id()}/tasks", body
+  end
+
+  def update_task(data \\ []) do
+    data = Enum.into(data, %{})
+    body = %{task: data}
+    put "/workspaces/#{workspace_id()}/tasks/#{data[:id]}", body
   end
 
   ##############################################################################
@@ -82,7 +89,7 @@ defmodule LiquidPlanner.HTTP do
     case Map.get(db, :workspace_id) do
       nil ->
         wksp = workspaces() |> hd |> Map.get("id")
-        Logger.debug "Woorkspace: #{inspect(wksp)}, DB: #{inspect(db)}"
+        Logger.debug "Workspace: #{inspect(wksp)}, DB: #{inspect(db)}"
         {:reply, wksp, Map.put(db, :workspace_id, wksp)}
       id ->
         {:reply, id, db}
